@@ -40,7 +40,7 @@ struct song_node *insert_song_order(struct song_node *old, char *art, char *song
   return start;
 }
 
-struct song_node *find_artist(struct song_node *start, char art[256]){
+struct song_node *find_artist(struct song_node *start, char *art){
   printf("looking for [%s]\n", art);
   while(start){
     if (strcmp(start -> artist, art) == 0){
@@ -54,7 +54,7 @@ struct song_node *find_artist(struct song_node *start, char art[256]){
   return NULL;
 }
 
-struct song_node *find_node(struct song_node *start, char art[256], char song[256]){
+struct song_node *find_node(struct song_node *start, char *art, char *song){
   printf("looking for [%s : %s]\n", art, song);
   while(start){
     if (strcmp(start -> artist, art) == 0 && strcmp(start -> name, song) == 0){
@@ -68,7 +68,7 @@ struct song_node *find_node(struct song_node *start, char art[256], char song[25
   return NULL;
 }
 
-struct song_node *remove_song(struct song_node *start, char art[256], char song[256]){
+struct song_node *remove_song(struct song_node *start, char *art, char *song){
   struct song_node *temp = start;
   printf("removing [%s : %s]\n", art, song);
   if (strcmp(start -> artist, art) == 0 && strcmp(start -> name, song) == 0){
@@ -116,4 +116,79 @@ struct song_node *free_list(struct song_node *letter){
   printf("list after free_list: ");
   print_list(letter);
   return letter;
+}
+
+void print_letter(char letter){
+  int i = letter - 96;
+  printf("%c list\n", letter);
+  print_list(table[i]);
+  printf("\n");
+}
+
+void print_library(){
+  int i = 1;
+  for (i; i < 27; i++) {
+    if (table[i]){
+      print_letter(96 + i);
+    }
+  }
+}
+
+struct song_node *find_artist_lib(char *art){
+  int i = art[0] - 96;
+  return find_artist(table[i], art);
+}
+
+struct song_node *find_node_lib(char *art, char *song){
+  int i = art[0] - 96;
+  return find_node(table[i], art, song);
+}
+
+struct song_node *remove_song_lib(char *art, char *song){
+  int i = art[0] - 96;
+  return remove_song(table[i], art, song);
+}
+
+
+
+void clear_library(){
+  int i = 1;
+  for (i; i < 27; i++){
+    while(table[i]){
+      free_list(table[i]);
+      table[i] = NULL;
+    }
+  }
+}
+
+struct song_node *add_song_lib(char *art, char *song){
+  int i = art[0] - 96;
+  if (table[i] == NULL){
+    table[i] = (struct song_node *)malloc(sizeof(struct song_node));
+    strcpy(table[i] -> artist, art);
+    strcpy(table[1] -> name, song);
+  }
+  else{
+    table[i] = insert_song_order(table[i], art, song);
+  }
+  return table[i];
+}
+
+struct song_node *find_artist_songs(char *art){
+  int i = art[0] - 96;
+  struct song_node *temp = find_artist(table[i], art);
+  while(strcmp(temp -> artist, art) == 0){
+    print_node(temp);
+    temp = temp -> next;
+  }
+}
+
+void shuffle() {
+  int i = rand() % 26 + 1;
+  while(table[i] == NULL){
+    i = rand() % 26 + 1;
+  }
+  rando(table[i]);
+  rando(table[i]);
+  rando(table[i]);
 }
